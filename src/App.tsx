@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 import { SidebarProvider, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -6,6 +6,34 @@ import { Home, MoreHorizontal, Settings, Users, FileText, Bell } from 'lucide-re
 
 function App() {
   const [activeTab, setActiveTab] = useState('home')
+  interface Todo {
+    id: number
+    todo: string
+    completed: boolean
+    userId: number
+  }
+
+  const [todos, setTodos] = useState<Todo[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchTodos = async () => {
+      setLoading(true)
+      try {
+        const res = await fetch('https://dummyjson.com/todos')
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
+        const data = await res.json()
+        setTodos(data.todos || [])
+      } catch (err: any) {
+        setError(err.message || 'Fetch error')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTodos()
+  }, [])
 
   return (
     <SidebarProvider className='w-full'>
@@ -14,8 +42,21 @@ function App() {
         {/* Sidebar */}
         <aside className="w-64 bg-blue-900/50 shadow-lg overflow-y-auto">
           <div className="p-6 border-b border-blue-800/50">
-          
-            <h2 className="text-lg font-bold">HealDocs</h2>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 flex-shrink-0">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8">
+                  <rect width="24" height="24" rx="5" fill="url(#g)" />
+                  <path d="M11 7h2v4h4v2h-4v4h-2v-4H7v-2h4V7z" fill="white" />
+                  <defs>
+                    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0" stopColor="#3b82f6" />
+                      <stop offset="1" stopColor="#1e40af" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <h2 className="text-lg font-bold">HealDocs</h2>
+            </div>
           </div>
           
           <nav className="p-2 space-y-2">
@@ -104,16 +145,22 @@ function App() {
           {/* Content Area */}
           <div className="flex-1 overflow-auto p-6">
             {activeTab === 'Todo Liste' && (
-              <div className="grid grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-lg shadow">
-                 
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow">
-                 
-                </div>
-                <div className="bg-white p-6 rounded-lg shadow">
-                
-                </div>
+              <div>
+                {loading && <div className="text-gray-600">Chargement...</div>}
+                {error && <div className="text-red-500">Erreur: {error}</div>}
+
+                {!loading && !error && (
+                  <div className="grid grid-cols-3 gap-6">
+                    {todos.slice(0, 9).map((t) => (
+                      <div key={t.id} className={` p-6 rounded-lg shadow text-sm ${t.completed ? 'bg-green-600/30' : 'bg-gray-500/30'}`}>
+                        <h3 className="font-semibold mb-2">{t.todo}</h3>
+                        <p className={`text-sm ${t.completed ? 'text-green-600' : 'text-gray-500'}`}>
+                          {t.completed ? 'Terminé' : 'En cours'}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
             
