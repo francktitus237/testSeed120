@@ -26,12 +26,24 @@ function App() {
                   }`}
                 >
                   <Home size={20} />
-                  <span>Home</span>
+                  <span>Overview</span>
                 </button>
               </SidebarMenuButton>
             </SidebarMenuItem>
 
-            
+             <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <button 
+                  onClick={() => setActiveTab('team')}
+                  className={`w-full flex items-center gap-3 px-4 py-3 ${
+                    activeTab === 'team' ? 'bg-blue-700' : 'hover:bg-blue-800'
+                  }`}
+                >
+                  <Users size={20} />
+                  <span>Team mate</span>
+                </button>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
             
 
             <SidebarMenuItem>
@@ -42,8 +54,8 @@ function App() {
                     activeTab === 'settings' ? 'bg-blue-700' : 'hover:bg-blue-800'
                   }`}
                 >
-                  <Settings size={20} />
-                  <span>Settings</span>
+                  <FileText size={20} />
+                  <span>Todo List</span>
                 </button>
               </SidebarMenuButton>
             </SidebarMenuItem>
